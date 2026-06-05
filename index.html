@@ -72,7 +72,7 @@
                 <a href="#about" class="nav-link text-sm font-semibold text-slate-600 hover:text-brand transition-colors">소개</a>
                 <a href="#products" class="nav-link text-sm font-semibold text-slate-600 hover:text-brand transition-colors">제품 갤러리</a>
                 <a href="#ai-consulting" class="nav-link text-sm font-semibold text-brand hover:text-brand-dark transition-colors flex items-center gap-1">
-                    <span class="animate-pulse">✨</span> AI 스타일링
+                    <span>✨</span> AI 스타일링
                 </a>
                 <a href="#services" class="nav-link text-sm font-semibold text-slate-600 hover:text-brand transition-colors">안심 서비스</a>
                 <a href="#booking" class="nav-link text-sm font-semibold text-slate-600 hover:text-brand transition-colors">예약 및 위치</a>
@@ -667,8 +667,8 @@
         };
 
         // Gemini API Configuration
-        const apiKey = ""; // 런타임 환경에서 주입되는 안전한 구조의 빈 값 유지
-        const modelName = "gemini-2.5-flash-preview-09-2025";
+        const apiKey = ""; // 로컬 테스트 시에는 여기에 키를 직접 작성하여 점검할 수 있습니다.
+        const modelName = "gemini-3.5-flash";
         
         // AI 컨설팅 상태 추적 변수
         let selectedFace = '';
@@ -917,7 +917,6 @@
                 이 정보를 바탕으로 최상의 안경테 프레임 디자인 및 가공 렌즈를 엄선하여 제안해줘.
             `;
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
             const payload = {
                 contents: [{ parts: [{ text: userPrompt }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -937,12 +936,30 @@
                 }
             };
 
-            try {
-                const data = await fetchWithRetry(url, {
+            // API 엔드포인트 및 옵션 동적 설정 (로컬 환경과 Vercel 프로덕션 환경 동시 호환 지원)
+            let requestUrl = "";
+            let fetchOptions = {};
+
+            if (apiKey && apiKey.trim() !== "") {
+                // 1. 로컬 개발 환경용 직접 호출 루트
+                requestUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+                fetchOptions = {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
-                });
+                };
+            } else {
+                // 2. Vercel 서버리스 프록시 환경 활용 엔드포인트 (안전한 프로덕션 배포 상태)
+                requestUrl = "/api/consult";
+                fetchOptions = {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                };
+            }
+
+            try {
+                const data = await fetchWithRetry(requestUrl, fetchOptions);
 
                 const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (!rawText) {
