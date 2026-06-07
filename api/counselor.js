@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     }
 
     // Google API 호출 주소 세팅 (보안된 환경 변수 API 키 매핑)
-    const googleApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-Lite:generateContent?key=${apiKey}`;
+    const googleApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
 
     // 시스템 프롬프트 가이드라인 정의
     const systemPrompt = `당신은 대한민국 대표 성민안경의 숙련되고 정직하며 자상한 '눈 건강 전문 인공지능 카운셀러'입니다.
