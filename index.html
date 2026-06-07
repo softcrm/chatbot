@@ -14,6 +14,9 @@
     <!-- CSS 프레임워크: Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- 마크다운 렌더링 라이브러리: Marked CDN 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <!-- Tailwind 설정 커스터마이징 -->
     <script>
         tailwind.config = {
@@ -56,6 +59,17 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* 마크다운 제목 및 본문 요소 스타일링 (Tailwind Reset 극복 목적) */
+        #counselor-answer-content h1 { font-size: 1.5rem; font-weight: 800; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #111827; border-bottom: 2px solid #F1F3F5; padding-bottom: 0.25rem; }
+        #counselor-answer-content h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #111827; border-left: 4px solid #007BFF; padding-left: 0.5rem; }
+        #counselor-answer-content h3 { font-size: 1.125rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.25rem; color: #111827; }
+        #counselor-answer-content p { margin-bottom: 0.75rem; line-height: 1.6; }
+        #counselor-answer-content ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+        #counselor-answer-content ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+        #counselor-answer-content li { margin-bottom: 0.25rem; }
+        #counselor-answer-content strong { font-weight: 700; color: #111827; }
+        #counselor-answer-content blockquote { border-left: 4px solid #E5E7EB; padding-left: 1rem; color: #4B5563; font-style: italic; margin-bottom: 0.75rem; }
     </style>
 </head>
 <body class="bg-white text-neutral-900 font-sans antialiased overflow-x-hidden">
@@ -829,7 +843,9 @@
                         if (replyText) {
                             loader.classList.add('hidden');
                             answerContent.classList.remove('hidden');
-                            answerContent.textContent = replyText;
+                            
+                            // textContent 대신 marked.parse를 사용하여 마크다운 규격을 HTML로 렌더링
+                            answerContent.innerHTML = marked.parse(replyText);
                             success = true;
                             break;
                         }
